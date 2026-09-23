@@ -1,0 +1,104 @@
+[
+    {
+        "file": "ada-libs-2.9.2-r4.apk",
+        "sha256": "c779862a644ef722e1ca5ba9a64fcc648e68e80374f1d6a33b81d33fe464c2b2",
+        "license": "( Apache-2.0 OR MIT ) AND MPL-2.0",
+        "sourceRecipe": "https://gitlab.alpinelinux.org/alpine/aports/-/tree/7a81e7ec2d2c790b4f6ab3d901b209c9df630995/main/ada"
+    },
+    {
+        "file": "brotli-libs-1.1.0-r2.apk",
+        "sha256": "44182528fb903e97b14dc5848732752873e1a21ecc21d17c4538e2c0b1f1101e",
+        "license": "MIT",
+        "sourceRecipe": "https://gitlab.alpinelinux.org/alpine/aports/-/tree/9c7716c2221405ce7810ba3eaaa1f62d2e646c20/main/brotli"
+    },
+    {
+        "file": "c-ares-1.34.8-r0.apk",
+        "sha256": "23adbfe5527f89aeddd3f364adc36848b7bde8b246efce7e2905f8f25a247423",
+        "license": "MIT",
+        "sourceRecipe": "https://gitlab.alpinelinux.org/alpine/aports/-/tree/3366070614dbbf4e22a9e560c90eeb934752a2cd/main/c-ares"
+    },
+    {
+        "file": "icu-data-en-76.1-r1.apk",
+        "sha256": "75ff8210622b992668338c3430826a8a3cd94a43c54c8bae5cefa609198d08d2",
+        "license": "ICU",
+        "sourceRecipe": "https://gitlab.alpinelinux.org/alpine/aports/-/tree/e62b56b09ba0bed460d61072fffd977992d936bc/main/icu"
+    },
+    {
+        "file": "icu-libs-76.1-r1.apk",
+        "sha256": "62fd66a367b1e9abad6dffa90604b638354018389068d62fe601ee2436a9dcbc",
+        "license": "ICU",
+        "sourceRecipe": "https://gitlab.alpinelinux.org/alpine/aports/-/tree/e62b56b09ba0bed460d61072fffd977992d936bc/main/icu"
+    },
+    {
+        "file": "libcrypto3-3.5.8-r0.apk",
+        "sha256": "0e213a6181a38fcd71df7ec50980ce98e777de5abe605268ab8bcbfa53683738",
+        "license": "Apache-2.0",
+        "sourceRecipe": "https://gitlab.alpinelinux.org/alpine/aports/-/tree/1b80b7c3bf5ba3f13eb748ae953d9215d5a4bb62/main/openssl"
+    },
+    {
+        "file": "libgcc-14.2.0-r6.apk",
+        "sha256": "a34b11774b5129374540676551071c60486a40ff507812d001a144ae44ffd7ea",
+        "license": "GPL-2.0-or-later AND LGPL-2.1-or-later",
+        "sourceRecipe": "https://gitlab.alpinelinux.org/alpine/aports/-/tree/fbf60319be3bbaf6dd32ef55cc6fb7189e05c266/main/gcc"
+    },
+    {
+        "file": "libssl3-3.5.8-r0.apk",
+        "sha256": "e9ef7bc20c418f32617fc00614f728a4ed380d4f0088a0b22064c2f705c17133",
+        "license": "Apache-2.0",
+        "sourceRecipe": "https://gitlab.alpinelinux.org/alpine/aports/-/tree/1b80b7c3bf5ba3f13eb748ae953d9215d5a4bb62/main/openssl"
+    },
+    {
+        "file": "libstdc++-14.2.0-r6.apk",
+        "sha256": "009297e8c8a9a9ed12518cce15fe07d0274de7146bf20e363b2f132e083c6ec6",
+        "license": "GPL-2.0-or-later AND LGPL-2.1-or-later",
+        "sourceRecipe": "https://gitlab.alpinelinux.org/alpine/aports/-/tree/fbf60319be3bbaf6dd32ef55cc6fb7189e05c266/main/gcc"
+    },
+    {
+        "file": "musl-1.2.5-r12.apk",
+        "sha256": "d047373c9afb6eaac68df1d03128ac75803350b0368327af85cc95a5b042a1da",
+        "license": "MIT",
+        "sourceRecipe": "https://gitlab.alpinelinux.org/alpine/aports/-/tree/1546f29a1fd233db15464ce000b6247ed71b31e7/main/musl"
+    },
+    {
+        "file": "nghttp2-libs-1.69.0-r0.apk",
+        "sha256": "70c16aa0bf0ace08427e546a8c5966a1059794f629fad8fe9bf945af187ee810",
+        "license": "MIT",
+        "sourceRecipe": "https://gitlab.alpinelinux.org/alpine/aports/-/tree/87de39802b2c34c9a7c62a52b3e39e05af1c974e/main/nghttp2"
+    },
+    {
+        "file": "nodejs-22.23.2-r0.apk",
+        "sha256": "0d513c2081f2c4cdb5a97aaab47fddbdb716c837e863f8326b32279d8b90ad7c",
+        "license": "MIT",
+        "sourceRecipe": "https://gitlab.alpinelinux.org/alpine/aports/-/tree/c788155709094e82d9e696656aef7a837ad11765/main/nodejs"
+    },
+    {
+        "file": "simdjson-3.12.0-r0.apk",
+        "sha256": "eced8abb65dab728a3a35560f340a1cee6e77b60154c00195b66ea41640fc527",
+        "license": "Apache-2.0 OR MIT",
+        "sourceRecipe": "https://gitlab.alpinelinux.org/alpine/aports/-/tree/2b5e2732388d9b1f35e9bcb835aa26b51607fe98/main/simdjson"
+    },
+    {
+        "file": "simdutf-7.2.1-r0.apk",
+        "sha256": "680932d50ec9f50d4b788275f1f26a22ee079721e69c4dad8b507f18d59aa68b",
+        "license": "Apache-2.0 OR MIT",
+        "sourceRecipe": "https://gitlab.alpinelinux.org/alpine/aports/-/tree/9d7ccba8d72623b0d62c39fdb2958c01fa7413fc/main/simdutf"
+    },
+    {
+        "file": "sqlite-libs-3.49.2-r1.apk",
+        "sha256": "8f02658fa7fb60a4d25b8a167fbd140bd58ea26d2d56f8ef15d8c16b3d1e6447",
+        "license": "blessing",
+        "sourceRecipe": "https://gitlab.alpinelinux.org/alpine/aports/-/tree/dac9cea7503a4e9b84d647aab2492d733ac4ac8c/main/sqlite"
+    },
+    {
+        "file": "zlib-1.3.2-r0.apk",
+        "sha256": "486231ba02da32d11a86d29ff838a6991a435b8d8c433926278efdbbcaea74dd",
+        "license": "Zlib",
+        "sourceRecipe": "https://gitlab.alpinelinux.org/alpine/aports/-/tree/0276ab73299b3fd158361983f2f4ba573e0f7526/main/zlib"
+    },
+    {
+        "file": "zstd-libs-1.5.7-r0.apk",
+        "sha256": "af64af859e619af891546e18f1c5bb22f1d9c05fa7b74aef6579b253c3be62a1",
+        "license": "BSD-3-Clause OR GPL-2.0-or-later",
+        "sourceRecipe": "https://gitlab.alpinelinux.org/alpine/aports/-/tree/fc7fd35c7bf99156ae31962877c074f679f45b73/main/zstd"
+    }
+]
