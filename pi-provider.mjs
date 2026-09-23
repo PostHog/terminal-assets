@@ -9,7 +9,7 @@ async function terminalFetch(input, init) {
     if (request.method !== 'POST' || new URL(request.url).pathname !== '/v1/messages') {
         throw new Error('The PostHog provider only supports model messages.')
     }
-    const signal = AbortSignal.any([request.signal, AbortSignal.timeout(120_000)])
+    const signal = request.signal
     const id = randomUUID()
     const body = JSON.parse(await request.text())
     signal.throwIfAborted()
@@ -73,15 +73,19 @@ export default function posthogProvider(pi) {
         baseUrl: 'https://posthog.invalid',
         apiKey: 'posthog-session',
         api: 'anthropic-messages',
-        models: [{
-            id: 'claude-sonnet-4-6',
-            name: 'Claude Sonnet 4.6 (PostHog)',
+        models: [
+            { id: 'claude-opus-5', name: 'Claude Opus 5', cost: { input: 5, output: 25, cacheRead: 0.5, cacheWrite: 6.25 } },
+            { id: 'claude-sonnet-5', name: 'Claude Sonnet 5', cost: { input: 2, output: 10, cacheRead: 0.2, cacheWrite: 2.5 } },
+            { id: 'claude-sonnet-4-6', name: 'Claude Sonnet 4.6', cost: { input: 3, output: 15, cacheRead: 0.3, cacheWrite: 3.75 } },
+            { id: 'claude-haiku-4-5', name: 'Claude Haiku 4.5', cost: { input: 1, output: 5, cacheRead: 0.1, cacheWrite: 1.25 } },
+        ].map(model => ({
+            ...model,
+            name: `${model.name} (PostHog)`,
             reasoning: false,
             input: ['text', 'image'],
-            cost: { input: 3, output: 15, cacheRead: 0.3, cacheWrite: 3.75 },
             contextWindow: 200000,
             maxTokens: 8192,
-        }],
+        })),
         streamSimple: (model, context, options) => streamSimple(model, context, { ...options, fetch: terminalFetch }),
     })
     pi.on('before_agent_start', async (event) => ({

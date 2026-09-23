@@ -129,7 +129,7 @@ def build_pi(root: Path) -> dict[str, object]:
         "#!/bin/sh\n"
         + f'export PI_OFFLINE=1 PATH="{prefix}/bin:$PATH"\n'
         + f'exec node {prefix}/dist/bundle/cli.js --extension {prefix}/pi-provider.mjs '
-        + '--provider posthog --model claude-sonnet-4-6 "$@"\n'
+        + '--provider posthog --model claude-opus-5 "$@"\n'
     )
     launcher.chmod(0o755)
     return {

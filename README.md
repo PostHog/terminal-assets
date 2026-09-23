@@ -12,7 +12,9 @@ These archives are downloaded on first use and are separate from the terminal's 
 The terminal runs 32-bit Linux in v86.
 The archives include runtime dependencies, so installation needs no package manager or network connection inside the VM.
 pi includes Alpine x86 builds of fd and ripgrep for local file discovery and search.
-pi runs with `PI_OFFLINE=1` and defaults to the PostHog provider in `pi-provider.mjs`.
+pi runs with `PI_OFFLINE=1` and defaults to Claude Opus 5 through the PostHog provider in `pi-provider.mjs`.
+Use `/model` to choose Opus 5, Sonnet 5, Sonnet 4.6, or Haiku 4.5.
+The browser bridge enforces an idle timeout; active generations can run longer than two minutes.
 The provider carries Anthropic Messages streams through the terminal's `/posthog/.ai` bridge using the signed-in PostHog session.
 It keeps gateway credentials outside the VM and uses pi's upstream message and tool-call handling.
 External login and package downloads still require general networking, which the VM does not provide.
