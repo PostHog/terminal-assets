@@ -6,6 +6,7 @@ These archives are downloaded on first use and are separate from the terminal's 
 | Tool | Version | Runtime |
 | --- | --- | --- |
 | Node.js | 22.23.2 | Alpine Linux 3.22 x86, musl |
+| Doom (Freedoom) | 0.13.0-1 | Static fbDOOM, Linux framebuffer and PS/2 input |
 | pi | 0.87.1 | Node.js 22.19 or later |
 
 The terminal runs 32-bit Linux in v86.
@@ -73,3 +74,19 @@ Alpine build recipes and corresponding source URLs: [Alpine aports 3.22](https:/
 GCC runtime sources: [GCC 14.2.0](https://github.com/gcc-mirror/gcc/tree/releases/gcc-14.2.0).
 pi sources: [pi v0.87.1](https://github.com/earendil-works/pi/tree/v0.87.1).
 The exact binary packages, versions, and hashes are in `recipes/node-packages.json` and `recipes/pi-lock.json`; companion tool sources and hashes are in `recipes/pi-tools.json`.
+
+## Doom and framebuffer
+
+`python3 build.py --only doom` builds the standalone Doom archive from checksum-pinned binaries in `binaries/`.
+It includes fbDOOM, Freedoom phase 1, the launcher, and license notices.
+The launcher uses virtual console 5 and sends `display on` and `display off` to the host.
+The guest must provide that display command and framebuffer and input drivers.
+Closing the host display sends Ctrl+C to the serial foreground process group; the launcher restores the console when interrupted.
+
+`images/linux-fb-bzimage.bin` is the Linux 5.6.15 framebuffer kernel, with SHA-256 `33ca60bd4832f0cf202845fa7ac1a60776c0215e8a20d21a3f07d3722f99e415`.
+It retains the stock terminal initramfs and adds Bochs framebuffer and PS/2 drivers.
+`sh recipes/display/build.sh` rebuilds the kernel and static fbDOOM binary with Docker.
+The checked-in binaries originate from [PostHog/posthog#103893](https://github.com/PostHog/posthog/pull/103893), commit `0b3b63d8c4e5f5e3703a558fd87b5353556ca95d`.
+The build pins fbDOOM to `17280163bc95e5d954d2efaa0633489b763b4cd1` and musl to 1.2.5.
+`binaries/freedoom1.wad.gz` contains the unmodified phase 1 WAD from the [Freedoom 0.13.0 release](https://github.com/freedoom/freedoom/releases/tag/v0.13.0).
+See `licenses/display-NOTICE.txt` for source and license details.

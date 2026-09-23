@@ -139,14 +139,38 @@ def build_pi(root: Path) -> dict[str, object]:
     }
 
 
+def build_doom(root: Path) -> dict[str, object]:
+    inputs = {
+        "fbdoom-linux-i386.bin": "0a8f549829c113eff1cd1490b2a9a502596490f9a4880d75fdb0d93acc2f01ae",
+        "freedoom1.wad.gz": "8dfc9bcdb4b96809e69c516209048d46cc99d4fdd5e3179a6aaa98f7fe9491e1",
+    }
+    for name, sha256 in inputs.items():
+        if hashlib.sha256((ROOT / "binaries" / name).read_bytes()).hexdigest() != sha256:
+            raise ValueError(f"Changed Doom input: {name}")
+    (root / "bin").mkdir()
+    (root / "share").mkdir()
+    shutil.copyfile(ROOT / "binaries/fbdoom-linux-i386.bin", root / "bin/fbdoom")
+    shutil.copyfile(ROOT / "recipes/doom.sh", root / "bin/doom")
+    (root / "bin/fbdoom").chmod(0o755)
+    (root / "bin/doom").chmod(0o755)
+    (root / "share/freedoom1.wad").write_bytes(gzip.decompress((ROOT / "binaries/freedoom1.wad.gz").read_bytes()))
+    return {
+        "name": "Doom (Freedoom)",
+        "version": "0.13.0-1",
+        **pack(root, "doom-0.13.0-1-linux-i386.tar.gz"),
+        "dependencies": [],
+        "commands": {"doom": "/opt/posthog-packages/doom-0.13.0-1/bin/doom"},
+    }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--only", choices=["node", "pi"])
+    parser.add_argument("--only", choices=["node", "pi", "doom"])
     args = parser.parse_args()
     manifest = {"packages": {}}
     if (ROOT / "manifest.json").exists():
         manifest = json.loads((ROOT / "manifest.json").read_text())
-    for name, build in [("node", build_node), ("pi", build_pi)]:
+    for name, build in [("node", build_node), ("pi", build_pi), ("doom", build_doom)]:
         if args.only and args.only != name:
             continue
         with tempfile.TemporaryDirectory() as temporary:

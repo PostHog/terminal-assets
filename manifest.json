@@ -26,6 +26,18 @@
             "commands": {
                 "pi": "/opt/posthog-packages/pi-0.87.1/bin/pi"
             }
+        },
+        "doom": {
+            "name": "Doom (Freedoom)",
+            "version": "0.13.0-1",
+            "file": "archives/doom-0.13.0-1-linux-i386.tar.gz",
+            "sha256": "ad30e46e87f35cc5e5d841c6430b56e464cef494a590675330c4d7dabb5977a3",
+            "size": 10479089,
+            "archiveSize": 29480960,
+            "dependencies": [],
+            "commands": {
+                "doom": "/opt/posthog-packages/doom-0.13.0-1/bin/doom"
+            }
         }
     }
 }
