@@ -141,7 +141,7 @@ def build_pi(root: Path) -> dict[str, object]:
 
 def build_doom(root: Path) -> dict[str, object]:
     inputs = {
-        "fbdoom-linux-i386.bin": "0a8f549829c113eff1cd1490b2a9a502596490f9a4880d75fdb0d93acc2f01ae",
+        "fbdoom-linux-i386.bin": "175d9849d0ebbe450a3b7b5d610e53cc8487f80677025514353b8a388ce18c2f",
         "freedoom1.wad.gz": "8dfc9bcdb4b96809e69c516209048d46cc99d4fdd5e3179a6aaa98f7fe9491e1",
     }
     for name, sha256 in inputs.items():

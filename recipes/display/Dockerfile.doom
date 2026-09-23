@@ -1,0 +1,10 @@
+FROM debian:bullseye@sha256:6f519a81440354a85eb592c5f32109ab80605f6b892455983a6f618bf87fabe9
+RUN sed -i -e '/^deb /d' -e 's/^# deb /deb /' /etc/apt/sources.list && apt-get -o Acquire::Check-Valid-Until=false update && apt-get install -y --no-install-recommends gcc-i686-linux-gnu make wget ca-certificates git patch && rm -rf /var/lib/apt/lists/*
+WORKDIR /build
+RUN wget -q https://musl.libc.org/releases/musl-1.2.5.tar.gz && echo 'a9a118bbe84d8764da0ea0d28b3ab3fae8477fc7e4085d90102b8596fc7c75e4  musl-1.2.5.tar.gz' | sha256sum -c && tar xf musl-1.2.5.tar.gz
+RUN cd musl-1.2.5 && ./configure --target=i686-linux-gnu --prefix=/opt/musl --disable-shared --enable-wrapper=gcc && make -j4 && make install
+RUN apt-get -o Acquire::Check-Valid-Until=false update && apt-get install -y --no-install-recommends linux-libc-dev-i386-cross
+RUN cp -r /usr/i686-linux-gnu/include/linux /usr/i686-linux-gnu/include/asm /usr/i686-linux-gnu/include/asm-generic /opt/musl/include/
+RUN git clone https://github.com/maximevince/fbDOOM.git && cd fbDOOM && git checkout 17280163bc95e5d954d2efaa0633489b763b4cd1
+COPY mouse.patch /build/mouse.patch
+RUN cd fbDOOM && patch -p1 < /build/mouse.patch && make -C fbdoom -j4 CC=/opt/musl/bin/musl-gcc NOSDL=1 LDFLAGS='-static -Wl,--gc-sections' && i686-linux-gnu-strip fbdoom/fbdoom

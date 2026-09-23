@@ -31,8 +31,8 @@
             "name": "Doom (Freedoom)",
             "version": "0.13.0-1",
             "file": "archives/doom-0.13.0-1-linux-i386.tar.gz",
-            "sha256": "ad30e46e87f35cc5e5d841c6430b56e464cef494a590675330c4d7dabb5977a3",
-            "size": 10479089,
+            "sha256": "470aefa7b775d738b21377b9e764c37c006f730fa665f30acf65258fd42492b0",
+            "size": 10479126,
             "archiveSize": 29480960,
             "dependencies": [],
             "commands": {

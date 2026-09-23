@@ -17,4 +17,7 @@ freedoom1.wad.gz.bin
     Source: https://github.com/freedoom/freedoom/releases/tag/v0.13.0
     This file is freedoom1.wad from the release, compressed with gzip.
 
-The initial binaries were imported from PostHog/posthog commit 0b3b63d8c4e5f5e3703a558fd87b5353556ca95d.
+The kernel and game data were imported from PostHog/posthog commit 0b3b63d8c4e5f5e3703a558fd87b5353556ca95d.
+
+The fbDOOM binary includes PostHog mouse input changes from recipes/display/mouse.patch.
+Rebuild it with recipes/display/Dockerfile.doom from the pinned fbDOOM source.

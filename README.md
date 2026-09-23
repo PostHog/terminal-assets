@@ -86,7 +86,10 @@ Closing the host display sends Ctrl+C to the serial foreground process group; th
 `images/linux-fb-bzimage.bin` is the Linux 5.6.15 framebuffer kernel, with SHA-256 `33ca60bd4832f0cf202845fa7ac1a60776c0215e8a20d21a3f07d3722f99e415`.
 It retains the stock terminal initramfs and adds Bochs framebuffer and PS/2 drivers.
 `sh recipes/display/build.sh` rebuilds the kernel and static fbDOOM binary with Docker.
-The checked-in binaries originate from [PostHog/posthog#103893](https://github.com/PostHog/posthog/pull/103893), commit `0b3b63d8c4e5f5e3703a558fd87b5353556ca95d`.
+The kernel and game data originate from [PostHog/posthog#103893](https://github.com/PostHog/posthog/pull/103893), commit `0b3b63d8c4e5f5e3703a558fd87b5353556ca95d`.
 The build pins fbDOOM to `17280163bc95e5d954d2efaa0633489b763b4cd1` and musl to 1.2.5.
 `binaries/freedoom1.wad.gz` contains the unmodified phase 1 WAD from the [Freedoom 0.13.0 release](https://github.com/freedoom/freedoom/releases/tag/v0.13.0).
 See `licenses/display-NOTICE.txt` for source and license details.
+
+The fbDOOM binary is rebuilt with `recipes/display/Dockerfile.doom` and `mouse.patch`, which reads PS/2 packets from `/dev/input/mice`.
+Mouse movement turns the player, and the left mouse button fires.
