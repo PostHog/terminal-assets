@@ -1,0 +1,23 @@
+The terminal display bundles these third-party components. Build them with recipes/display/build.sh.
+
+linux-fb-bzimage.bin
+    Linux 5.6.15, GPL-2.0 WITH Linux-syscall-note. See linux-COPYING.txt and linux-GPL-2.0.txt.
+    Source: https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-5.6.15.tar.xz
+    Configuration: recipes/display/kernel.config
+    Embeds the initramfs of the v86 Buildroot image (https://i.copy.sh/buildroot-bzimage.bin, Buildroot 2020.05).
+
+fbdoom-linux-i386.bin
+    fbDOOM, GPL-2.0-or-later. See linux-GPL-2.0.txt for the license text.
+    Source: https://github.com/maximevince/fbDOOM at 17280163bc95e5d954d2efaa0633489b763b4cd1
+    Statically linked with musl 1.2.5, MIT. See musl-COPYRIGHT.txt.
+    Source: https://musl.libc.org/releases/musl-1.2.5.tar.gz
+
+freedoom1.wad.gz.bin
+    Freedoom 0.13.0 phase 1, BSD-3-Clause. See freedoom-COPYING.txt.
+    Source: https://github.com/freedoom/freedoom/releases/tag/v0.13.0
+    This file is freedoom1.wad from the release, compressed with gzip.
+
+The kernel and game data were imported from PostHog/posthog commit 0b3b63d8c4e5f5e3703a558fd87b5353556ca95d.
+
+The fbDOOM binary includes PostHog mouse input changes from recipes/display/mouse.patch.
+Rebuild it with recipes/display/Dockerfile.doom from the pinned fbDOOM source.

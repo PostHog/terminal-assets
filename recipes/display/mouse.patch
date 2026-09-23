@@ -1,0 +1,55 @@
+--- a/fbdoom/i_input_tty.c
++++ b/fbdoom/i_input_tty.c
+@@ -254,6 +254,32 @@
+ static int old_mode = -1;
+ static struct termios old_term;
+ static int kb = -1; /* keyboard file descriptor */
++static int mouse_fd = -1;
++extern int usemouse;
++
++static void mouse_read(void)
++{
++    static unsigned char packet[3];
++    static int count = 0;
++    unsigned char byte;
++    event_t event;
++
++    while (mouse_fd >= 0 && read(mouse_fd, &byte, 1) == 1)
++    {
++        /* Bit 3 marks the first byte of a PS/2 packet. */
++        if (count == 0 && !(byte & 8))
++            continue;
++        packet[count++] = byte;
++        if (count != 3)
++            continue;
++        count = 0;
++        event.type = ev_mouse;
++        event.data1 = packet[0] & 7;
++        event.data2 = (packet[1] - ((packet[0] & 16) ? 256 : 0)) * 4;
++        event.data3 = (packet[2] - ((packet[0] & 32) ? 256 : 0)) * 4;
++        D_PostEvent(&event);
++    }
++}
+ 
+ void kbd_shutdown(void)
+ {
+@@ -432,6 +458,8 @@
+     int pressed;
+     unsigned char key;
+ 
++    mouse_read();
++
+     // put event-grabbing stuff in here
+     
+     while (kbd_read(&pressed, &key))
+@@ -494,6 +522,10 @@
+ void I_InitInput(void)
+ {
+     kbd_init();
++    mouse_fd = open("/dev/input/mice", O_RDONLY | O_NONBLOCK);
++    usemouse = mouse_fd >= 0;
++    if (usemouse)
++        printf("Mouse input ready on /dev/input/mice.\n");
+ 
+     //UpdateFocus();
+ }
