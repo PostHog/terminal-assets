@@ -108,12 +108,34 @@ def build_pi(root: Path) -> dict[str, object]:
         if path.is_file() and (path.name.endswith((".map", ".d.ts", ".d.cts", ".d.mts"))):
             path.unlink()
     (root / "npm-shrinkwrap.json").write_text(json.dumps(lock, indent=2) + "\n")
+    for package in json.loads((ROOT / "recipes/pi-tools.json").read_text()):
+        data = download(package["url"], f"sha256-{package['sha256']}")
+        with tarfile.open(fileobj=io.BytesIO(data), mode="r:gz", ignore_zeros=True) as archive:
+            archive.extractall(root, members=[m for m in archive if m.name.startswith(("lib/", "usr/"))], filter="data")
+    prefix = f"/opt/posthog-packages/pi-{PI_VERSION}"
+    node = f"/opt/posthog-packages/node-{NODE_VERSION}"
+    (root / "bin").mkdir(exist_ok=True)
+    for command in ("fd", "rg"):
+        launcher = root / "bin" / command
+        launcher.write_text(
+            "#!/bin/sh\n"
+            + f"exec {node}/lib/ld-musl-i386.so.1 --library-path {prefix}/usr/lib:{node}/lib:{node}/usr/lib "
+            + f'{prefix}/usr/bin/{command} "$@"\n'
+        )
+        launcher.chmod(0o755)
+    launcher = root / "bin/pi"
+    launcher.write_text(
+        "#!/bin/sh\n"
+        + f'export PI_OFFLINE=1 PATH="{prefix}/bin:$PATH"\n'
+        + f'exec node {prefix}/dist/bundle/cli.js "$@"\n'
+    )
+    launcher.chmod(0o755)
     return {
         "name": "pi",
         "version": PI_VERSION,
         **pack(root, f"pi-{PI_VERSION}.tar.gz"),
         "dependencies": ["node"],
-        "commands": {"pi": f"env PI_OFFLINE=1 node /opt/posthog-packages/pi-{PI_VERSION}/dist/bundle/cli.js"},
+        "commands": {"pi": f"{prefix}/bin/pi"},
     }
 
 

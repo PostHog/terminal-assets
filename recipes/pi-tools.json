@@ -1,0 +1,20 @@
+[
+  {
+    "url": "https://dl-cdn.alpinelinux.org/alpine/v3.22/community/x86/fd-10.2.0-r0.apk",
+    "sha256": "9a799ec106ec9bec3c0db84f47b37d71c6bb4483d815df6c7ef83ce7312ce909",
+    "license": "MIT Apache-2.0",
+    "sourceRecipe": "https://gitlab.alpinelinux.org/alpine/aports/-/tree/6ea9595a6bd16fef380d9c682cb7eba54fc8f432/community/fd"
+  },
+  {
+    "url": "https://dl-cdn.alpinelinux.org/alpine/v3.22/community/x86/ripgrep-14.1.1-r0.apk",
+    "sha256": "144376eed03ad01dbb52f7d3454c2d94bb702545a522296265f14df6d426b6d8",
+    "license": "MIT OR Unlicense",
+    "sourceRecipe": "https://gitlab.alpinelinux.org/alpine/aports/-/tree/4e899d119e4c983a938436d6f397a509521225d1/community/ripgrep"
+  },
+  {
+    "url": "https://dl-cdn.alpinelinux.org/alpine/v3.22/main/x86/pcre2-10.46-r0.apk",
+    "sha256": "eafeb653254c467dcdf2032a6a936db0c5f500733a49d16d6a1a8e5b0225f0b9",
+    "license": "BSD-3-Clause",
+    "sourceRecipe": "https://gitlab.alpinelinux.org/alpine/aports/-/tree/a22c8c27a78e00ea7cf03e09c6033a6336ee22a2/main/pcre2"
+  }
+]

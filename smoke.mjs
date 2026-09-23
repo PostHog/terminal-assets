@@ -49,6 +49,12 @@ ln -s '${node}/lib/ld-musl-i386.so.1' /lib/ld-musl-i386.so.1
 ln -s '${node}/bin/node' /usr/bin/node
 node -e 'const assert = require("assert"); assert.equal(process.version, "v${manifest.packages.node.version}"); assert(new RegExp("^\\\\p{RGI_Emoji}$", "v").test("😀")); assert.equal(require("child_process").execFileSync(process.execPath, ["-p", "6 * 7"], { encoding: "utf8" }).trim(), "42"); console.log("Node runtime, Unicode, and child process checks passed")'
 export PI_OFFLINE=1
+export PATH="${pi}/bin:$PATH"
+fd --version
+rg --version
+printf "companion check\\n" > /tmp/companion.txt
+rg -q "companion check" /tmp/companion.txt
+fd --base-directory /tmp companion | grep -q companion.txt
 [ "$(node '${pi}/dist/bundle/cli.js' --version)" = '${manifest.packages.pi.version}' ]
 node '${pi}/dist/bundle/cli.js' --help > /tmp/pi-help
 grep -q 'AI coding assistant' /tmp/pi-help

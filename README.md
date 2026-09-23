@@ -10,6 +10,7 @@ These archives are downloaded on first use and are separate from the terminal's 
 
 The terminal runs 32-bit Linux in v86.
 The archives include runtime dependencies, so installation needs no package manager or network connection inside the VM.
+pi includes Alpine x86 builds of fd and ripgrep for local file discovery and search.
 pi runs with `PI_OFFLINE=1`; model calls and login require a separate network bridge.
 
 ## Build
@@ -71,4 +72,4 @@ Node and bundled dependency sources: [Node.js v22.23.2](https://github.com/nodej
 Alpine build recipes and corresponding source URLs: [Alpine aports 3.22](https://gitlab.alpinelinux.org/alpine/aports/-/tree/3.22-stable/main).
 GCC runtime sources: [GCC 14.2.0](https://github.com/gcc-mirror/gcc/tree/releases/gcc-14.2.0).
 pi sources: [pi v0.87.1](https://github.com/earendil-works/pi/tree/v0.87.1).
-The exact binary packages, versions, and hashes are in `recipes/node-packages.json` and `recipes/pi-lock.json`.
+The exact binary packages, versions, and hashes are in `recipes/node-packages.json` and `recipes/pi-lock.json`; companion tool sources and hashes are in `recipes/pi-tools.json`.
