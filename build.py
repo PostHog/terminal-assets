@@ -124,10 +124,12 @@ def build_pi(root: Path) -> dict[str, object]:
         )
         launcher.chmod(0o755)
     launcher = root / "bin/pi"
+    shutil.copyfile(ROOT / "pi-provider.mjs", root / "pi-provider.mjs")
     launcher.write_text(
         "#!/bin/sh\n"
         + f'export PI_OFFLINE=1 PATH="{prefix}/bin:$PATH"\n'
-        + f'exec node {prefix}/dist/bundle/cli.js "$@"\n'
+        + f'exec node {prefix}/dist/bundle/cli.js --extension {prefix}/pi-provider.mjs '
+        + '--provider posthog --model claude-sonnet-4-6 "$@"\n'
     )
     launcher.chmod(0o755)
     return {

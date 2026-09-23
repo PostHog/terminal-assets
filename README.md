@@ -11,7 +11,10 @@ These archives are downloaded on first use and are separate from the terminal's 
 The terminal runs 32-bit Linux in v86.
 The archives include runtime dependencies, so installation needs no package manager or network connection inside the VM.
 pi includes Alpine x86 builds of fd and ripgrep for local file discovery and search.
-pi runs with `PI_OFFLINE=1`; model calls and login require a separate network bridge.
+pi runs with `PI_OFFLINE=1` and defaults to the PostHog provider in `pi-provider.mjs`.
+The provider carries Anthropic Messages streams through the terminal's `/posthog/.ai` bridge using the signed-in PostHog session.
+It keeps gateway credentials outside the VM and uses pi's upstream message and tool-call handling.
+External login and package downloads still require general networking, which the VM does not provide.
 
 ## Build
 
@@ -26,7 +29,7 @@ It never runs npm lifecycle scripts.
 Node.js and its shared libraries come from Alpine's official x86 packages.
 pi comes from the published npm package and its dependency lockfile, with missing upstream lockfile integrity values pinned from the npm registry.
 Type declarations, type-only packages, and source maps are omitted from the pi archive.
-All executable code and runtime resources remain upstream code.
+Upstream runtime code remains unchanged; the PostHog provider extension and launchers are maintained here.
 
 The Node launcher configures its own library and ICU data paths.
 The guest must provide `/lib/ld-musl-i386.so.1`; the PostHog terminal links its bundled musl loader there.
