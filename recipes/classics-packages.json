@@ -1,0 +1,58 @@
+[
+    {
+        "name": "sl",
+        "version": "5.02-r1",
+        "url": "https://dl-cdn.alpinelinux.org/alpine/v3.22/community/x86/sl-5.02-r1.apk",
+        "sha256": "d8424467e6920f4986939600f89c657512909a1c29183db10212d9c6c283a6e4",
+        "license": "MIT",
+        "sourceRecipe": "https://gitlab.alpinelinux.org/alpine/aports/-/tree/bf0ba8caaa3dbd969bc54450efd5498c35fd7173/community/sl"
+    },
+    {
+        "name": "cmatrix",
+        "version": "2.0-r2",
+        "url": "https://dl-cdn.alpinelinux.org/alpine/v3.22/community/x86/cmatrix-2.0-r2.apk",
+        "sha256": "00a41054c3fece1beafcac595c6766b29fe6e839c573dbbd38759c6f13af5cd5",
+        "license": "GPL-3.0-or-later",
+        "sourceRecipe": "https://gitlab.alpinelinux.org/alpine/aports/-/tree/dcf926d126ee921df71282780cae6c160fe30783/community/cmatrix"
+    },
+    {
+        "name": "figlet",
+        "version": "2.2.5-r3",
+        "url": "https://dl-cdn.alpinelinux.org/alpine/v3.22/community/x86/figlet-2.2.5-r3.apk",
+        "sha256": "392872b187c6d98c1c0917680205b255b595c9cba1497d2e62ba1fb15d9650fc",
+        "license": "BSD-3-Clause",
+        "sourceRecipe": "https://gitlab.alpinelinux.org/alpine/aports/-/tree/dcf926d126ee921df71282780cae6c160fe30783/community/figlet"
+    },
+    {
+        "name": "nyancat",
+        "version": "1.5.2-r1",
+        "url": "https://dl-cdn.alpinelinux.org/alpine/v3.22/community/x86/nyancat-1.5.2-r1.apk",
+        "sha256": "a1ad421b91a4adba90a7190d5e7a4b2a5711cce11e5cabfd0ef3fae5cbae6c7d",
+        "license": "NCSA",
+        "sourceRecipe": "https://gitlab.alpinelinux.org/alpine/aports/-/tree/6d3f459f1e2a47230cb5fb845d196b48fbbe1ae5/community/nyancat"
+    },
+    {
+        "name": "musl",
+        "version": "1.2.5-r12",
+        "url": "https://dl-cdn.alpinelinux.org/alpine/v3.22/main/x86/musl-1.2.5-r12.apk",
+        "sha256": "d047373c9afb6eaac68df1d03128ac75803350b0368327af85cc95a5b042a1da",
+        "license": "MIT",
+        "sourceRecipe": "https://gitlab.alpinelinux.org/alpine/aports/-/tree/1546f29a1fd233db15464ce000b6247ed71b31e7/main/musl"
+    },
+    {
+        "name": "libncursesw",
+        "version": "6.5_p20250503-r0",
+        "url": "https://dl-cdn.alpinelinux.org/alpine/v3.22/main/x86/libncursesw-6.5_p20250503-r0.apk",
+        "sha256": "b1262e30c3eb0c9a9b74dba4f33c36ca37e33c4a060429af22f371236bfd4d61",
+        "license": "X11",
+        "sourceRecipe": "https://gitlab.alpinelinux.org/alpine/aports/-/tree/3fefbe8dda8b3e85458edb190e2f3a69ad16035c/main/ncurses"
+    },
+    {
+        "name": "ncurses-terminfo-base",
+        "version": "6.5_p20250503-r0",
+        "url": "https://dl-cdn.alpinelinux.org/alpine/v3.22/main/x86/ncurses-terminfo-base-6.5_p20250503-r0.apk",
+        "sha256": "3264426877964e0ac55488ede6313e907d3663f831008b45fa27c95d60ac34b8",
+        "license": "X11",
+        "sourceRecipe": "https://gitlab.alpinelinux.org/alpine/aports/-/tree/3fefbe8dda8b3e85458edb190e2f3a69ad16035c/main/ncurses"
+    }
+]

@@ -8,6 +8,10 @@ These archives are downloaded on first use and are separate from the terminal's 
 | Node.js | 22.23.2 | Alpine Linux 3.22 x86, musl |
 | Doom (Freedoom) | 0.13.0-1 | Static fbDOOM, Linux framebuffer and PS/2 input |
 | pi | 0.87.1 | Node.js 22.19 or later |
+| sl | 5.02-r1 | Alpine Linux 3.22 x86, musl and ncurses |
+| cmatrix | 2.0-r2 | Alpine Linux 3.22 x86, musl and ncurses |
+| figlet | 2.2.5-r3 | Alpine Linux 3.22 x86, musl |
+| nyancat | 1.5.2-r1 | Alpine Linux 3.22 x86, musl |
 
 The terminal runs 32-bit Linux in v86.
 The archives include runtime dependencies, so installation needs no package manager or network connection inside the VM.
@@ -52,6 +56,14 @@ From a prepared PostHog checkout, run:
 The smoke test uses the checkout's v86 package and existing kernel and firmware.
 It checks Node execution, Unicode regex data, child Node processes, and pi's version and help output in a 512 MiB VM.
 The terminal's live Storybook story exercises browser downloads, verification, caching, and installation.
+
+For the classic terminal commands, run `python3 build.py --only classics`, then `.codex/with-flox node /path/to/terminal-assets/smoke.mjs "$PWD" --classics` from a prepared PostHog checkout.
+The smoke test checks banner fonts and piped input, bounded Nyan Cat animation, ncurses rendering, and quitting Matrix in the Linux guest.
+Each command has a separate archive with its own runtime libraries, so it does not need Node.js or another optional package.
+The sl launcher enables Ctrl+C with `-e`; cmatrix exits with `q` or Ctrl+C, and nyancat exits with Ctrl+C.
+The figlet launcher sets its bundled font directory and accepts upstream options and piped text.
+`recipes/classics-packages.json` pins the Alpine packages, hashes, licenses, and corresponding source recipes.
+The archives include the upstream license notices, including nyancat's copyright notice in its source file.
 
 ## Publish and add tools
 

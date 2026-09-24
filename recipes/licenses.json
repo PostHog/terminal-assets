@@ -58,5 +58,30 @@
     "file": "pcre2.txt",
     "url": "https://raw.githubusercontent.com/PCRE2Project/pcre2/pcre2-10.46/LICENCE.md",
     "sha256": "9cf7ac6976099a1d856826d3ef1b093bd6b84489dc6100628ac79e740cf9885a"
+  },
+  {
+    "file": "sl.txt",
+    "url": "https://raw.githubusercontent.com/mtoyoda/sl/5.02/LICENSE",
+    "sha256": "72c7d262e2c9ddf019edc90af852a01a410338efff4e75e1c005b77ada4be7c4"
+  },
+  {
+    "file": "cmatrix.txt",
+    "url": "https://raw.githubusercontent.com/abishekvashok/cmatrix/v2.0/COPYING",
+    "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903"
+  },
+  {
+    "file": "figlet.txt",
+    "url": "https://raw.githubusercontent.com/cmatsuoka/figlet/2.2.5/LICENSE",
+    "sha256": "f76ebead3d632cd27592ea2c2d5a1de42dd61dfbf021fb883bbd435f0c2a0431"
+  },
+  {
+    "file": "nyancat.txt",
+    "url": "https://raw.githubusercontent.com/klange/nyancat/1.5.2/src/nyancat.c",
+    "sha256": "a98e675c36dc859f7a52abdabb8cdc8e585806c8f582e33f40b77c9276e49ed1"
+  },
+  {
+    "file": "ncurses.txt",
+    "url": "https://raw.githubusercontent.com/ThomasDickey/ncurses-snapshots/v6_5_20250503/COPYING",
+    "sha256": "708999f95527e1ffa670c6fce288c6c600cb477dd04afcc1171422b3dd4ee226"
   }
 ]

@@ -165,9 +165,50 @@ def build_doom(root: Path) -> dict[str, object]:
     }
 
 
+CLASSICS = ("sl", "cmatrix", "figlet", "nyancat")
+
+
+def build_classic(root: Path, name: str) -> dict[str, object]:
+    packages = json.loads((ROOT / "recipes/classics-packages.json").read_text())
+    package = next(package for package in packages if package["name"] == name)
+    version = package["version"]
+    required = {name, "musl"}
+    if name in {"sl", "cmatrix"}:
+        required.update({"libncursesw", "ncurses-terminfo-base"})
+    for dependency in packages:
+        if dependency["name"] not in required:
+            continue
+        data = download(dependency["url"], f"sha256-{dependency['sha256']}")
+        with tarfile.open(fileobj=io.BytesIO(data), mode="r:gz", ignore_zeros=True) as archive:
+            archive.extractall(
+                root, members=[m for m in archive if m.name.startswith(("lib/", "usr/", "etc/"))], filter="data"
+            )
+    prefix = f"/opt/posthog-packages/{name}-{version}"
+    (root / "bin").mkdir()
+    launcher = root / "bin" / name
+    arguments = {
+        "sl": "-e ",
+        "figlet": f"-d {prefix}/usr/share/figlet/fonts ",
+    }.get(name, "")
+    launcher.write_text(
+        "#!/bin/sh\n"
+        + f"export TERMINFO={prefix}/etc/terminfo\n"
+        + f"exec {prefix}/lib/ld-musl-i386.so.1 --library-path {prefix}/lib:{prefix}/usr/lib "
+        + f'{prefix}/usr/bin/{name} {arguments}"$@"\n'
+    )
+    launcher.chmod(0o755)
+    return {
+        "name": name,
+        "version": version,
+        **pack(root, f"{name}-{version}-linux-i386.tar.gz"),
+        "dependencies": [],
+        "commands": {name: f"{prefix}/bin/{name}"},
+    }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--only", choices=["node", "pi", "doom"])
+    parser.add_argument("--only", choices=["node", "pi", "doom", "classics", *CLASSICS])
     args = parser.parse_args()
     manifest = {"packages": {}}
     if (ROOT / "manifest.json").exists():
@@ -177,6 +218,12 @@ def main() -> None:
             continue
         with tempfile.TemporaryDirectory() as temporary:
             manifest["packages"][name] = build(Path(temporary))
+            sys.stdout.write(json.dumps(manifest["packages"][name], indent=2) + "\n")
+    for name in CLASSICS:
+        if args.only and args.only not in {name, "classics"}:
+            continue
+        with tempfile.TemporaryDirectory() as temporary:
+            manifest["packages"][name] = build_classic(Path(temporary), name)
             sys.stdout.write(json.dumps(manifest["packages"][name], indent=2) + "\n")
     (ROOT / "manifest.json").write_text(json.dumps(manifest, indent=4) + "\n")
 
