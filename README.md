@@ -6,7 +6,7 @@ These archives are downloaded on first use and are separate from the terminal's 
 | Tool | Version | Runtime |
 | --- | --- | --- |
 | Node.js | 22.23.2 | Alpine Linux 3.22 x86, musl |
-| Doom (Freedoom) | 0.13.0-1 | Static fbDOOM, Linux framebuffer and PS/2 input |
+| Doom (Freedoom) | 0.13.0-2 | Static fbDOOM, Linux framebuffer and PS/2 input |
 | pi | 0.87.1 | Node.js 22.19 or later |
 | sl | 5.02-r1 | Alpine Linux 3.22 x86, musl and ncurses |
 | cmatrix | 2.0-r2 | Alpine Linux 3.22 x86, musl and ncurses |
@@ -109,4 +109,8 @@ The build pins fbDOOM to `17280163bc95e5d954d2efaa0633489b763b4cd1` and musl to 
 See `licenses/display-NOTICE.txt` for source and license details.
 
 The fbDOOM binary is rebuilt with `recipes/display/Dockerfile.doom` and `mouse.patch`, which reads PS/2 packets from `/dev/input/mice`.
-Mouse movement turns the player, and the left mouse button fires.
+Mouse movement turns the player without moving forward or backward, and the left mouse button fires.
+`controls.patch` enables configuration loading and saving and aligns Space and Ctrl bindings with the console input driver.
+The caller can supply WASD bindings with `-config`; existing configuration files remain editable.
+
+Run `.codex/with-flox node /path/to/terminal-assets/smoke-doom-controls.mjs "$PWD"` from a prepared PostHog checkout to record a game and verify movement, strafing, turning, firing, and use commands.

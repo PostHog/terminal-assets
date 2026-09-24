@@ -6,5 +6,5 @@ RUN cd musl-1.2.5 && ./configure --target=i686-linux-gnu --prefix=/opt/musl --di
 RUN apt-get -o Acquire::Check-Valid-Until=false update && apt-get install -y --no-install-recommends linux-libc-dev-i386-cross
 RUN cp -r /usr/i686-linux-gnu/include/linux /usr/i686-linux-gnu/include/asm /usr/i686-linux-gnu/include/asm-generic /opt/musl/include/
 RUN git clone https://github.com/maximevince/fbDOOM.git && cd fbDOOM && git checkout 17280163bc95e5d954d2efaa0633489b763b4cd1
-COPY mouse.patch /build/mouse.patch
-RUN cd fbDOOM && patch -p1 < /build/mouse.patch && make -C fbdoom -j4 CC=/opt/musl/bin/musl-gcc NOSDL=1 LDFLAGS='-static -Wl,--gc-sections' && i686-linux-gnu-strip fbdoom/fbdoom
+COPY mouse.patch controls.patch /build/
+RUN cd fbDOOM && patch -p1 < /build/mouse.patch && patch -p1 < /build/controls.patch && make -C fbdoom -j4 CC=/opt/musl/bin/musl-gcc NOSDL=1 LDFLAGS='-static -Wl,--gc-sections' && i686-linux-gnu-strip fbdoom/fbdoom

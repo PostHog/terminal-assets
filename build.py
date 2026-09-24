@@ -143,7 +143,7 @@ def build_pi(root: Path) -> dict[str, object]:
 
 def build_doom(root: Path) -> dict[str, object]:
     inputs = {
-        "fbdoom-linux-i386.bin": "175d9849d0ebbe450a3b7b5d610e53cc8487f80677025514353b8a388ce18c2f",
+        "fbdoom-linux-i386.bin": "57c5031cff9202d4ffd52b6adfb550cdbc0286096f98a288546069dc65e2b385",
         "freedoom1.wad.gz": "8dfc9bcdb4b96809e69c516209048d46cc99d4fdd5e3179a6aaa98f7fe9491e1",
     }
     for name, sha256 in inputs.items():
@@ -158,10 +158,10 @@ def build_doom(root: Path) -> dict[str, object]:
     (root / "share/freedoom1.wad").write_bytes(gzip.decompress((ROOT / "binaries/freedoom1.wad.gz").read_bytes()))
     return {
         "name": "Doom (Freedoom)",
-        "version": "0.13.0-1",
-        **pack(root, "doom-0.13.0-1-linux-i386.tar.gz"),
+        "version": "0.13.0-2",
+        **pack(root, "doom-0.13.0-2-linux-i386.tar.gz"),
         "dependencies": [],
-        "commands": {"doom": "/opt/posthog-packages/doom-0.13.0-1/bin/doom"},
+        "commands": {"doom": "/opt/posthog-packages/doom-0.13.0-2/bin/doom"},
     }
 
 

@@ -26,7 +26,7 @@
 +        event.type = ev_mouse;
 +        event.data1 = packet[0] & 7;
 +        event.data2 = (packet[1] - ((packet[0] & 16) ? 256 : 0)) * 4;
-+        event.data3 = (packet[2] - ((packet[0] & 32) ? 256 : 0)) * 4;
++        event.data3 = 0;
 +        D_PostEvent(&event);
 +    }
 +}
