@@ -11,6 +11,8 @@ const v86Path = require.resolve('v86')
 const { V86 } = await import(pathToFileURL(v86Path).href)
 const asset = name => Uint8Array.from(fs.readFileSync(path.join(posthog, 'frontend/src/scenes/terminal/assets', name))).buffer
 const manifest = JSON.parse(fs.readFileSync(new URL('./manifest.json', import.meta.url)))
+const classics = ['sl', 'cmatrix', 'figlet', 'nyancat']
+const classicsOnly = process.argv.includes('--classics')
 const vm = new V86({
     wasm_path: path.join(path.dirname(v86Path), 'v86.wasm'),
     bios: { buffer: asset('seabios.bin') }, vga_bios: { buffer: asset('vgabios.bin') },
@@ -33,13 +35,39 @@ vm.add_listener('serial0-output-byte', byte => {
         started = true
         void (async () => {
             for (const [id, pkg] of Object.entries(manifest.packages)) {
+                if (classicsOnly && !classics.includes(id)) continue
                 const bytes = gunzipSync(fs.readFileSync(new URL(pkg.file, import.meta.url)))
                 assert.equal(bytes.length, pkg.archiveSize)
                 await vm.create_file(id + '.tar', bytes)
             }
             const node = '/opt/posthog-packages/node-' + manifest.packages.node.version
             const pi = '/opt/posthog-packages/pi-' + manifest.packages.pi.version
-            await vm.create_file('smoke.sh', Buffer.from(`set -eu
+            const classicSetup = classics.map(id => {
+                const prefix = '/opt/posthog-packages/' + id + '-' + manifest.packages[id].version
+                return `mkdir -p '${prefix}'; tar -xf /mnt/${id}.tar -C '${prefix}'; ln -s '${prefix}/bin/${id}' /usr/bin/${id}`
+            }).join('\n')
+            const classicChecks = `set -eu
+mkdir -p /opt/posthog-packages
+mount -t tmpfs -o size=64m tmpfs /opt/posthog-packages
+${classicSetup}
+export TERM=xterm-256color
+stty rows 24 cols 80
+figlet PostHog > /tmp/banner
+grep -q '_' /tmp/banner
+figlet -f small PostHog > /tmp/small-banner
+test -s /tmp/small-banner
+printf 'PostHog' | figlet > /tmp/piped-banner
+cmp /tmp/banner /tmp/piped-banner
+nyancat -f 2 > /tmp/cat
+test -s /tmp/cat
+cmatrix -V 2>&1 | grep -q '2.0'
+printf q | cmatrix -b > /tmp/matrix
+sl -l > /tmp/train
+test -s /tmp/matrix
+test -s /tmp/train
+printf 'Classic commands, fonts, pipes, animation, and Matrix quit checks passed\\n'
+`
+            await vm.create_file('smoke.sh', Buffer.from(classicsOnly ? classicChecks : `set -eu
 mkdir -p /opt/posthog-packages
 mount -t tmpfs -o size=256m tmpfs /opt/posthog-packages
 mkdir '${node}' '${pi}'
