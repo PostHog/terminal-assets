@@ -1,0 +1,16 @@
+--- a/fbdoom/m_config.c
++++ b/fbdoom/m_config.c
+@@ -1593 +1593 @@
+-    'o',    'p',    '[',    ']',    13,		KEY_RCTRL, 'a',    's',
++    'o',    'p',    '[',    ']',    13,		KEY_FIRE, 'a',    's',
+@@ -1597 +1597 @@
+-    KEY_RALT,  ' ',  KEY_CAPSLOCK,KEY_F1,  KEY_F2,   KEY_F3,   KEY_F4,   KEY_F5,
++    KEY_RALT,  KEY_USE,  KEY_CAPSLOCK,KEY_F1,  KEY_F2,   KEY_F3,   KEY_F4,   KEY_F5,
+@@ -1611 +1610,0 @@
+-#if ORIGCODE
+@@ -1711 +1709,0 @@
+-#endif
+@@ -1773 +1770,0 @@
+-#if ORIGCODE
+@@ -1831 +1827,0 @@
+-#endif
