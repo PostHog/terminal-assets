@@ -83,5 +83,97 @@
     "file": "ncurses.txt",
     "url": "https://raw.githubusercontent.com/ThomasDickey/ncurses-snapshots/v6_5_20250503/COPYING",
     "sha256": "708999f95527e1ffa670c6fce288c6c600cb477dd04afcc1171422b3dd4ee226"
+  },
+  {
+    "file": "neovim.txt",
+    "url": "https://raw.githubusercontent.com/neovim/neovim/v0.11.1/LICENSE.txt",
+    "sha256": "e1ff044cabc90a87faf9356618a5c43078c020c3c5e98a4dee570dd098da043d"
+  },
+  {
+    "file": "neovim-vim.txt",
+    "url": "https://raw.githubusercontent.com/neovim/neovim/v0.11.1/runtime/doc/uganda.txt",
+    "sha256": "229c575cd3877f4db4f1610f7bbad85573a20d8c6152baca428989c295093dc0"
+  },
+  {
+    "file": "libuv.txt",
+    "url": "https://raw.githubusercontent.com/libuv/libuv/v1.51.0/LICENSE",
+    "sha256": "16de0c32b265cb7d46a6d3bd614f259dd4d693a5e26b3407b04aae8d73041f0c"
+  },
+  {
+    "file": "luv.txt",
+    "url": "https://raw.githubusercontent.com/luvit/luv/1.51.0-1/LICENSE.txt",
+    "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  {
+    "file": "tree-sitter.txt",
+    "url": "https://raw.githubusercontent.com/tree-sitter/tree-sitter/v0.25.10/LICENSE",
+    "sha256": "5f9cf9fb6acb1972b35ae29119ce563bb60ec097656bc4b69b9bac2d04c7a147"
+  },
+  {
+    "file": "utf8proc.txt",
+    "url": "https://raw.githubusercontent.com/JuliaStrings/utf8proc/v2.10.0/LICENSE.md",
+    "sha256": "3b510150d34f248a221bb88e1d811238d6c6c18b51231822c42974c39bb07256"
+  },
+  {
+    "file": "unibilium.txt",
+    "url": "https://raw.githubusercontent.com/neovim/unibilium/v2.1.1/LICENSE",
+    "sha256": "e6db578a208783788f05c03d0631d3e4367893707c069c4379d4d3e7e4357dd9"
+  },
+  {
+    "file": "luajit.txt",
+    "url": "https://raw.githubusercontent.com/openresty/luajit2/v2.1-20240815/COPYRIGHT",
+    "sha256": "38e5fc77c875170535ecccb6ddd1922b252a0ecca6f2561301bae17aa276e23c"
+  },
+  {
+    "file": "unibilium-lgpl.txt",
+    "url": "https://raw.githubusercontent.com/neovim/unibilium/v2.1.1/LGPLv3",
+    "sha256": "a853c2ffec17057872340eee242ae4d96cbf2b520ae27d903e1b2fef1a5f9d1c"
+  },
+  {
+    "file": "gettext-lgpl.txt",
+    "url": "https://raw.githubusercontent.com/autotools-mirror/gettext/v0.24.1/gettext-runtime/intl/COPYING.LIB",
+    "sha256": "20e50fe7aae3e56378ebf0417d9de904f55a0e61e4df315333e632a4d3555d95"
+  },
+  {
+    "file": "lua.txt",
+    "url": "https://www.lua.org/ftp/lua-5.1.5.tar.gz",
+    "sha256": "ee5e3e82af1e1b543c4f216e399d7c8cfee797711913f349e385101c4ae60a79",
+    "archiveMember": "lua-5.1.5/COPYRIGHT"
+  },
+  {
+    "file": "lpeg.html",
+    "url": "https://www.inf.puc-rio.br/~roberto/lpeg/lpeg-1.1.0.tar.gz",
+    "sha256": "3f4f8a7997d9e0d9d0fca6d2b9877a5714251fff056783dd71288413b0abcf36",
+    "archiveMember": "lpeg-1.1.0/lpeg.html"
+  },
+  {
+    "file": "tree-sitter-c.txt",
+    "url": "https://raw.githubusercontent.com/tree-sitter/tree-sitter-c/v0.23.5/LICENSE",
+    "sha256": "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1"
+  },
+  {
+    "file": "tree-sitter-lua.txt",
+    "url": "https://raw.githubusercontent.com/tree-sitter-grammars/tree-sitter-lua/v0.3.0/LICENSE.md",
+    "sha256": "9a32b02e4c917b1ce6b5e79d8ea81e25cefd7f27d89c7235f2afb262c06cf32e"
+  },
+  {
+    "file": "tree-sitter-markdown.txt",
+    "url": "https://raw.githubusercontent.com/tree-sitter-grammars/tree-sitter-markdown/v0.5.0/LICENSE",
+    "sha256": "52ec8a1bf8256511e2a92613e0bb41ffefba3897f16fa958d7bb28c466dd4804"
+  },
+  {
+    "file": "tree-sitter-query.txt",
+    "url": "https://raw.githubusercontent.com/tree-sitter-grammars/tree-sitter-query/v0.4.0/LICENSE",
+    "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+  },
+  {
+    "file": "tree-sitter-vim.txt",
+    "url": "https://raw.githubusercontent.com/tree-sitter-grammars/tree-sitter-vim/v0.4.0/LICENSE",
+    "sha256": "14eaaaa5c0cdb0eb86e85c55643c4cfa04593dbfbaef6a20f35337667b7278d7"
+  },
+  {
+    "file": "tree-sitter-vimdoc.txt",
+    "url": "https://raw.githubusercontent.com/neovim/tree-sitter-vimdoc/v3.0.0/LICENSE",
+    "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
   }
 ]
