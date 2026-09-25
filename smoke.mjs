@@ -13,6 +13,7 @@ const asset = name => Uint8Array.from(fs.readFileSync(path.join(posthog, 'fronte
 const manifest = JSON.parse(fs.readFileSync(new URL('./manifest.json', import.meta.url)))
 const classics = ['sl', 'cmatrix', 'figlet', 'nyancat']
 const classicsOnly = process.argv.includes('--classics')
+const neovimOnly = process.argv.includes('--neovim')
 const vm = new V86({
     wasm_path: path.join(path.dirname(v86Path), 'v86.wasm'),
     bios: { buffer: asset('seabios.bin') }, vga_bios: { buffer: asset('vgabios.bin') },
@@ -36,6 +37,7 @@ vm.add_listener('serial0-output-byte', byte => {
         void (async () => {
             for (const [id, pkg] of Object.entries(manifest.packages)) {
                 if (classicsOnly && !classics.includes(id)) continue
+                if (neovimOnly && id !== 'neovim') continue
                 const bytes = gunzipSync(fs.readFileSync(new URL(pkg.file, import.meta.url)))
                 assert.equal(bytes.length, pkg.archiveSize)
                 await vm.create_file(id + '.tar', bytes)
@@ -67,7 +69,40 @@ test -s /tmp/matrix
 test -s /tmp/train
 printf 'Classic commands, fonts, pipes, animation, and Matrix quit checks passed\\n'
 `
-            await vm.create_file('smoke.sh', Buffer.from(classicsOnly ? classicChecks : `set -eu
+            const neovim = '/opt/posthog-packages/neovim-' + manifest.packages.neovim.version
+            const neovimChecks = `set -eu
+mkdir -p '${neovim}'
+tar -xf /mnt/neovim.tar -C '${neovim}'
+ln -s '${neovim}/lib/ld-musl-i386.so.1' /lib/ld-musl-i386.so.1
+ln -s '${neovim}/bin/nvim' /usr/bin/nvim
+export TERM=xterm-256color
+stty rows 24 cols 80
+nvim --version | grep 'NVIM v0.11.1'
+cat > /tmp/check.lua <<'LUA'
+assert(require('lpeg').match(require('lpeg').P('hello'), 'hello') == 6)
+assert(require('re').match('hello', "'hello'") == 6)
+assert(vim.uv.fs_stat('/tmp').type == 'directory')
+vim.cmd('edit /tmp/neovim-smoke.lua')
+vim.api.nvim_buf_set_lines(0, 0, -1, false, {'print("Neovim in PostHog")'})
+vim.cmd('set filetype=lua')
+vim.cmd('syntax on')
+assert(vim.bo.filetype == 'lua')
+for _, language in ipairs({'c', 'lua', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc'}) do
+    assert(vim.treesitter.language.add(language))
+end
+assert(#vim.treesitter.get_string_parser('return 42', 'lua'):parse() == 1)
+vim.cmd('write')
+assert(vim.fn.readfile('/tmp/neovim-smoke.lua')[1] == 'print("Neovim in PostHog")')
+vim.cmd('help nvim')
+assert(vim.bo.buftype == 'help')
+local child = vim.fn.system({vim.v.progpath, '--clean', '--headless', '+q'})
+assert(vim.v.shell_error == 0, child)
+vim.cmd('qa!')
+LUA
+nvim --clean --headless -l /tmp/check.lua
+printf 'Neovim file save, syntax, Lua modules, help, and child process checks passed\\n'
+`
+            await vm.create_file('smoke.sh', Buffer.from(neovimOnly ? neovimChecks : classicsOnly ? classicChecks : `set -eu
 mkdir -p /opt/posthog-packages
 mount -t tmpfs -o size=256m tmpfs /opt/posthog-packages
 mkdir '${node}' '${pi}'

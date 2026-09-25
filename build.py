@@ -168,6 +168,52 @@ def build_doom(root: Path) -> dict[str, object]:
 CLASSICS = ("sl", "cmatrix", "figlet", "nyancat")
 
 
+def build_neovim(root: Path) -> dict[str, object]:
+    recipe = ROOT / "recipes/neovim-packages.json"
+    packages = json.loads(recipe.read_text())
+    version = next(package["version"] for package in packages if package["name"] == "neovim")
+    for package in packages:
+        data = download(package["url"], f"sha256-{package['sha256']}")
+        with tarfile.open(fileobj=io.BytesIO(data), mode="r:gz", ignore_zeros=True) as archive:
+            archive.extractall(
+                root,
+                members=[
+                    m
+                    for m in archive
+                    if m.name.startswith(("lib/", "usr/", "etc/"))
+                    # neovim-doc provides the real help files instead of these placeholder links.
+                    and not (m.issym() and m.name.startswith("usr/share/nvim/runtime/doc/"))
+                ],
+                filter="data",
+            )
+    prefix = f"/opt/posthog-packages/neovim-{version}"
+    (root / "bin").mkdir()
+    launcher = root / "bin/nvim"
+    launcher.write_text(
+        "#!/bin/sh\n"
+        + "set -e\n"
+        + "# Alpine's Neovim binary links LPeg by its absolute path.\n"
+        + "mkdir -p /usr/lib/lua/5.1\n"
+        + f"ln -sf {prefix}/usr/lib/lua/5.1/lpeg.so /usr/lib/lua/5.1/lpeg.so\n"
+        + f"export LD_LIBRARY_PATH={prefix}/lib:{prefix}/usr/lib\n"
+        + f"export VIM={prefix}/usr/share/nvim VIMRUNTIME={prefix}/usr/share/nvim/runtime\n"
+        + f"export TERMINFO={prefix}/etc/terminfo\n"
+        + f"export LUA_CPATH='{prefix}/usr/lib/lua/5.1/?.so;;'\n"
+        + f"export LUA_PATH='{prefix}/usr/share/lua/5.1/?.lua;{prefix}/usr/share/luajit-2.1/?.lua;;'\n"
+        + f'exec {prefix}/usr/bin/nvim "$@"\n'
+    )
+    launcher.chmod(0o755)
+    (root / "licenses").mkdir()
+    shutil.copyfile(recipe, root / "licenses/neovim-packages.json")
+    return {
+        "name": "Neovim",
+        "version": version,
+        **pack(root, f"neovim-{version}-linux-i386.tar.gz"),
+        "dependencies": [],
+        "commands": {"nvim": f"{prefix}/bin/nvim"},
+    }
+
+
 def build_classic(root: Path, name: str) -> dict[str, object]:
     packages = json.loads((ROOT / "recipes/classics-packages.json").read_text())
     package = next(package for package in packages if package["name"] == name)
@@ -208,12 +254,12 @@ def build_classic(root: Path, name: str) -> dict[str, object]:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--only", choices=["node", "pi", "doom", "classics", *CLASSICS])
+    parser.add_argument("--only", choices=["node", "pi", "doom", "neovim", "classics", *CLASSICS])
     args = parser.parse_args()
     manifest = {"packages": {}}
     if (ROOT / "manifest.json").exists():
         manifest = json.loads((ROOT / "manifest.json").read_text())
-    for name, build in [("node", build_node), ("pi", build_pi), ("doom", build_doom)]:
+    for name, build in [("node", build_node), ("pi", build_pi), ("doom", build_doom), ("neovim", build_neovim)]:
         if args.only and args.only != name:
             continue
         with tempfile.TemporaryDirectory() as temporary:

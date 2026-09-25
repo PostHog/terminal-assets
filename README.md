@@ -6,6 +6,7 @@ These archives are downloaded on first use and are separate from the terminal's 
 | Tool | Version | Runtime |
 | --- | --- | --- |
 | Node.js | 22.23.2 | Alpine Linux 3.22 x86, musl |
+| Neovim | 0.11.1-r1 | Alpine Linux 3.22 x86, musl and LuaJIT |
 | Doom (Freedoom) | 0.13.0-2 | Static fbDOOM, Linux framebuffer and PS/2 input |
 | pi | 0.87.1 | Node.js 22.19 or later |
 | sl | 5.02-r1 | Alpine Linux 3.22 x86, musl and ncurses |
@@ -64,6 +65,14 @@ The sl launcher enables Ctrl+C with `-e`; cmatrix exits with `q` or Ctrl+C, and 
 The figlet launcher sets its bundled font directory and accepts upstream options and piped text.
 `recipes/classics-packages.json` pins the Alpine packages, hashes, licenses, and corresponding source recipes.
 The archives include the upstream license notices, including nyancat's copyright notice in its source file.
+
+For Neovim, run `python3 build.py --only neovim`, then `.codex/with-flox node /path/to/terminal-assets/smoke.mjs "$PWD" --neovim` from a prepared PostHog checkout.
+The smoke test checks file saves, Lua modules, syntax files, help documents, and child Neovim processes without installing Node.js.
+The `nvim` launcher sets the bundled library, Lua module, terminfo, and Neovim runtime paths.
+Like Node.js, Neovim requires the guest's `/lib/ld-musl-i386.so.1` link.
+`recipes/neovim-packages.json` pins the Alpine packages, hashes, licenses, and source recipes.
+The archive includes Neovim's runtime and help files, LuaJIT, Lua modules, shared libraries, and upstream license notices.
+Plugins that require downloads cannot install inside the guest because it has no general networking.
 
 ## Publish and add tools
 
