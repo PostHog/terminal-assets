@@ -8,5 +8,7 @@ RUN cp -r /usr/i686-linux-gnu/include/linux /usr/i686-linux-gnu/include/asm /usr
 RUN git clone https://github.com/maximevince/fbDOOM.git && cd fbDOOM && git checkout 17280163bc95e5d954d2efaa0633489b763b4cd1
 # fbDOOM omits the network code from Chocolate Doom 2.1.0, the release its headers match.
 RUN git clone https://github.com/chocolate-doom/chocolate-doom.git && cd chocolate-doom && git checkout d61a8018fd43137342a587b6e05a487e8c3a566b && cp src/aes_prng.c src/aes_prng.h src/net_client.c src/net_common.c src/net_common.h src/net_dedicated.c src/net_io.c src/net_loop.c src/net_packet.c src/net_query.c src/net_server.c src/net_structrw.c src/net_structrw.h /build/fbDOOM/fbdoom/
-COPY mouse.patch controls.patch netplay.patch /build/
-RUN cd fbDOOM && patch -p1 < /build/mouse.patch && patch -p1 < /build/controls.patch && patch -p1 < /build/netplay.patch && make -C fbdoom -j4 CC=/opt/musl/bin/musl-gcc NOSDL=1 LDFLAGS='-static -Wl,--gc-sections' && i686-linux-gnu-strip fbdoom/fbdoom
+COPY mouse.patch controls.patch netplay.patch net-settings-bounds.patch /build/
+RUN cd fbDOOM && patch -p1 < /build/mouse.patch && patch -p1 < /build/controls.patch && patch -p1 < /build/netplay.patch && patch -p1 < /build/net-settings-bounds.patch && make -C fbdoom -j4 CC=/opt/musl/bin/musl-gcc NOSDL=1 LDFLAGS='-static -Wl,--gc-sections' && i686-linux-gnu-strip fbdoom/fbdoom
+COPY test-net-settings.c /build/
+RUN /opt/musl/bin/musl-gcc -static -ffunction-sections -fdata-sections -I/build/fbDOOM/fbdoom -Wl,--gc-sections /build/test-net-settings.c /build/fbDOOM/fbdoom/net_structrw.c /build/fbDOOM/fbdoom/net_packet.c -o /build/test-net-settings
