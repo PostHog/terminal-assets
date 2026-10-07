@@ -23,4 +23,6 @@ The kernel and game data were imported from PostHog/posthog commit 0b3b63d8c4e5f
 
 The fbDOOM binary includes PostHog mouse input changes from recipes/display/mouse.patch
 and the serial network module and multiplayer lobby from recipes/display/netplay.patch.
+recipes/display/net-settings-bounds.patch backports the CVE-2020-14983 fix from
+https://github.com/chocolate-doom/chocolate-doom/commit/f1a8d991aa8a14afcb605cf2f65cd15fda204c56.
 Rebuild it with recipes/display/Dockerfile.doom from the pinned fbDOOM source.

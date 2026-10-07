@@ -1,0 +1,8 @@
+--- a/fbdoom/net_structrw.c
++++ b/fbdoom/net_structrw.c
+@@ -109,4 +109,4 @@ boolean NET_ReadSettings(net_packet_t *packet, net_gamesettings_t *settings)
+-    for (i = 0; i < settings->num_players; ++i)
++    for (i = 0; i < settings->num_players && i < NET_MAXPLAYERS; ++i)
+     {
+         if (!NET_ReadInt8(packet,
+                           (unsigned int *) &settings->player_classes[i]))
