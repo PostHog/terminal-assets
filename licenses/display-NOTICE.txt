@@ -9,6 +9,8 @@ linux-fb-bzimage.bin
 fbdoom-linux-i386.bin
     fbDOOM, GPL-2.0-or-later. See linux-GPL-2.0.txt for the license text.
     Source: https://github.com/maximevince/fbDOOM at 17280163bc95e5d954d2efaa0633489b763b4cd1
+    Network code from Chocolate Doom 2.1.0, GPL-2.0-or-later.
+    Source: https://github.com/chocolate-doom/chocolate-doom at d61a8018fd43137342a587b6e05a487e8c3a566b
     Statically linked with musl 1.2.5, MIT. See musl-COPYRIGHT.txt.
     Source: https://musl.libc.org/releases/musl-1.2.5.tar.gz
 
@@ -19,5 +21,6 @@ freedoom1.wad.gz.bin
 
 The kernel and game data were imported from PostHog/posthog commit 0b3b63d8c4e5f5e3703a558fd87b5353556ca95d.
 
-The fbDOOM binary includes PostHog mouse input changes from recipes/display/mouse.patch.
+The fbDOOM binary includes PostHog mouse input changes from recipes/display/mouse.patch
+and the serial network module and multiplayer lobby from recipes/display/netplay.patch.
 Rebuild it with recipes/display/Dockerfile.doom from the pinned fbDOOM source.

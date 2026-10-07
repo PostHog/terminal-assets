@@ -7,7 +7,7 @@ These archives are downloaded on first use and are separate from the terminal's 
 | --- | --- | --- |
 | Node.js | 22.23.2 | Alpine Linux 3.22 x86, musl |
 | Neovim | 0.11.1-r1 | Alpine Linux 3.22 x86, musl and LuaJIT |
-| Doom (Freedoom) | 0.13.0-2 | Static fbDOOM, Linux framebuffer and PS/2 input |
+| Doom (Freedoom) | 0.13.0-3 | Static fbDOOM, Linux framebuffer, PS/2 input and serial multiplayer |
 | pi | 0.87.1 | Node.js 22.19 or later |
 | sl | 5.02-r1 | Alpine Linux 3.22 x86, musl and ncurses |
 | cmatrix | 2.0-r2 | Alpine Linux 3.22 x86, musl and ncurses |
@@ -123,3 +123,16 @@ Mouse movement turns the player without moving forward or backward, and the left
 The caller can supply WASD bindings with `-config`; existing configuration files remain editable.
 
 Run `.codex/with-flox node /path/to/terminal-assets/smoke-doom-controls.mjs "$PWD"` from a prepared PostHog checkout to record a game and verify movement, strafing, turning, firing, and use commands.
+
+### Multiplayer
+
+`netplay.patch` enables Chocolate Doom 2.1.0's network code, which fbDOOM omits; `Dockerfile.doom` copies those sources from a pinned commit.
+The guest has no network card, so `net_serial.c` sends packets over `/dev/ttyS2`, the third serial port, and the browser relays them to the other players.
+Each SLIP frame starts with a peer byte: guest frames name the destination and browser frames name the source.
+Peer 0 is the game host, peers 1 to 254 are clients, and peer 255 carries text control messages.
+The guest sends `host`, `join <code>`, and `launched`; the browser replies with `room <code>`, `joined`, or `error <message>`.
+`net_lobby.c` replaces the textscreen lobby with a text screen on the active virtual console.
+The host presses Space to start, or passes `-nodes <n>` to start when that many players have joined.
+
+The host runs `doom -server -deathmatch`, and other players run `doom -connect <code>` with the room code from the lobby.
+Run `.codex/with-flox node /path/to/terminal-assets/smoke-doom-deathmatch.mjs "$PWD"` from a prepared PostHog checkout to connect two VMs through a local relay and verify that the host records the client's movement in a deathmatch.
