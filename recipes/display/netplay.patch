@@ -1,0 +1,745 @@
+--- a/fbdoom/Makefile
++++ b/fbdoom/Makefile
+@@ -34,6 +34,7 @@
+ OUTPUT=fbdoom
+ 
+ SRC_DOOM = i_main.o dummy.o am_map.o doomdef.o doomstat.o dstrings.o d_event.o d_items.o d_iwad.o d_loop.o d_main.o d_mode.o d_net.o f_finale.o f_wipe.o g_game.o hu_lib.o hu_stuff.o info.o i_cdmus.o i_endoom.o i_joystick.o i_scale.o i_sound.o i_system.o i_timer.o memio.o m_argv.o m_bbox.o m_cheat.o m_config.o m_controls.o m_fixed.o m_menu.o m_misc.o m_random.o p_ceilng.o p_doors.o p_enemy.o p_floor.o p_inter.o p_lights.o p_map.o p_maputl.o p_mobj.o p_plats.o p_pspr.o p_saveg.o p_setup.o p_sight.o p_spec.o p_switch.o p_telept.o p_tick.o p_user.o r_bsp.o r_data.o r_draw.o r_main.o r_plane.o r_segs.o r_sky.o r_things.o sha1.o sounds.o statdump.o st_lib.o st_stuff.o s_sound.o tables.o v_video.o wi_stuff.o w_checksum.o w_file.o w_file_stdc_unbuffered.o w_main.o w_wad.o z_zone.o
++SRC_DOOM += aes_prng.o net_client.o net_common.o net_dedicated.o net_io.o net_lobby.o net_loop.o net_packet.o net_query.o net_serial.o net_server.o net_structrw.o
+ OBJS += $(addprefix $(OBJDIR)/, $(SRC_DOOM))
+ 
+ all:	 $(OUTPUT)
+--- a/fbdoom/d_loop.c
++++ b/fbdoom/d_loop.c
+@@ -307,7 +307,6 @@
+     lasttime = GetAdjustedTime() / ticdup;
+ }
+ 
+-#if ORIGCODE
+ //
+ // Block until the game start message is received from the server.
+ //
+@@ -335,12 +334,9 @@
+     }
+ }
+ 
+-#endif
+-
+ void D_StartNetGame(net_gamesettings_t *settings,
+                     netgame_startup_callback_t callback)
+ {
+-#if ORIGCODE
+     int i;
+ 
+     offsetms = 0;
+@@ -436,17 +432,6 @@
+     //{
+     //    printf("Syncing netgames like Vanilla Doom.\n");
+     //}
+-#else
+-    settings->consoleplayer = 0;
+-	settings->num_players = 1;
+-	settings->player_classes[0] = player_class;
+-	settings->new_sync = 0;
+-	settings->extratics = 1;
+-	settings->ticdup = 1;
+-
+-	ticdup = settings->ticdup;
+-	new_sync = settings->new_sync;
+-#endif
+ }
+ 
+ boolean D_InitNetGame(net_connect_data_t *connect_data)
+--- a/fbdoom/doomfeatures.h
++++ b/fbdoom/doomfeatures.h
+@@ -29,7 +29,7 @@
+ 
+ // Enables multiplayer support (network games)
+ 
+-#undef FEATURE_MULTIPLAYER
++#define FEATURE_MULTIPLAYER
+ 
+ // Enables sound output
+ 
+--- a/fbdoom/dummy.c
++++ b/fbdoom/dummy.c
+@@ -24,10 +24,6 @@
+  *  public data                                                        *
+  *---------------------------------------------------------------------*/
+ 
+-boolean net_client_connected = false;
+-
+-boolean drone = false;
+-
+ /*---------------------------------------------------------------------*
+  *  private data                                                       *
+  *---------------------------------------------------------------------*/
+--- a/fbdoom/net_lobby.c
++++ b/fbdoom/net_lobby.c
+@@ -0,0 +1,222 @@
++//
++// Copyright(C) 2026 PostHog
++//
++// This program is free software; you can redistribute it and/or
++// modify it under the terms of the GNU General Public License
++// as published by the Free Software Foundation; either version 2
++// of the License, or (at your option) any later version.
++//
++// This program is distributed in the hope that it will be useful,
++// but WITHOUT ANY WARRANTY; without even the implied warranty of
++// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++// GNU General Public License for more details.
++//
++// DESCRIPTION:
++//     Text lobby for network games in the PostHog browser terminal.
++//     It replaces the textscreen GUI in net_gui.c and draws on the
++//     active virtual console before the game switches to graphics.
++//
++
++#include <fcntl.h>
++#include <stdarg.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <termios.h>
++#include <unistd.h>
++
++#include "doomtype.h"
++#include "i_system.h"
++#include "i_timer.h"
++#include "m_argv.h"
++#include "m_misc.h"
++#include "net_client.h"
++#include "net_gui.h"
++#include "net_lobby.h"
++#include "net_server.h"
++
++#define CONSOLE_DEVICE "/dev/tty0"
++#define KEY_ESCAPE 27
++
++static int console_fd = -1;
++
++static void OpenConsole(void)
++{
++    if (console_fd < 0)
++    {
++        console_fd = open(CONSOLE_DEVICE, O_RDWR | O_NOCTTY | O_NONBLOCK);
++    }
++}
++
++void NET_LobbyPrint(const char *format, ...)
++{
++    char buffer[2048];
++    va_list args;
++
++    OpenConsole();
++
++    va_start(args, format);
++    M_vsnprintf(buffer, sizeof(buffer), format, args);
++    va_end(args);
++
++    if (console_fd >= 0)
++    {
++        if (write(console_fd, buffer, strlen(buffer)) < 0)
++        {
++            // The lobby is informational; the game continues without it.
++        }
++    }
++}
++
++static void DrawLobby(char *screen, size_t screen_len)
++{
++    char line[128];
++    int i;
++
++    M_StringCopy(screen, "\033[H\033[2JPostHog deathmatch\n\n", screen_len);
++
++    if (net_serial_room[0] != '\0')
++    {
++        M_snprintf(line, sizeof(line),
++                   "Room code: %s\nTeammates join with: doom -connect %s\n\n",
++                   net_serial_room, net_serial_room);
++        M_StringConcat(screen, line, screen_len);
++    }
++
++    if (!net_client_received_wait_data)
++    {
++        M_StringConcat(screen, "Connecting...\n", screen_len);
++        return;
++    }
++
++    M_snprintf(line, sizeof(line), "Players (%i of %i):\n",
++               net_client_wait_data.num_players,
++               net_client_wait_data.max_players);
++    M_StringConcat(screen, line, screen_len);
++
++    for (i = 0; i < net_client_wait_data.num_players; ++i)
++    {
++        M_snprintf(line, sizeof(line), "  %i. %s%s\n", i + 1,
++                   net_client_wait_data.player_names[i],
++                   i == net_client_wait_data.consoleplayer ? " (you)" : "");
++        M_StringConcat(screen, line, screen_len);
++    }
++
++    if (net_client_wait_data.is_controller)
++    {
++        M_StringConcat(screen,
++                       "\nPress Space to start. Press Escape to leave.\n",
++                       screen_len);
++    }
++    else
++    {
++        M_StringConcat(screen,
++                       "\nWaiting for the host to start. Press Escape to leave.\n",
++                       screen_len);
++    }
++}
++
++void NET_WaitForLaunch(void)
++{
++    struct termios old_term;
++    struct termios term;
++    boolean have_term = false;
++    boolean launched = false;
++    char screen[2048];
++    char drawn[2048] = "";
++    byte keys[16];
++    int expected_nodes = 0;
++    int i;
++
++    //!
++    // @category net
++    // @arg <n>
++    //
++    // Autostart the netgame when n nodes (clients) have joined the server.
++    //
++
++    i = M_CheckParmWithArgs("-nodes", 1);
++
++    if (i > 0)
++    {
++        expected_nodes = atoi(myargv[i + 1]);
++    }
++
++    OpenConsole();
++
++    if (console_fd >= 0 && tcgetattr(console_fd, &old_term) == 0)
++    {
++        term = old_term;
++        term.c_lflag &= ~(ICANON | ECHO);
++        term.c_cc[VMIN] = 0;
++        term.c_cc[VTIME] = 0;
++        have_term = tcsetattr(console_fd, TCSANOW, &term) == 0;
++    }
++
++    while (net_waiting_for_launch)
++    {
++        ssize_t key_count = console_fd >= 0
++                          ? read(console_fd, keys, sizeof(keys)) : 0;
++        boolean start = false;
++
++        for (i = 0; i < key_count; ++i)
++        {
++            if (keys[i] == ' ' || keys[i] == '\n' || keys[i] == '\r')
++            {
++                start = true;
++            }
++            // Arrow keys also begin with Escape, so only a lone Escape quits.
++            else if (keys[i] == KEY_ESCAPE && key_count == 1)
++            {
++                if (have_term)
++                {
++                    tcsetattr(console_fd, TCSANOW, &old_term);
++                }
++                I_Quit();
++            }
++        }
++
++        if (net_client_received_wait_data
++         && net_client_wait_data.is_controller
++         && expected_nodes > 0
++         && net_client_wait_data.num_players
++          + net_client_wait_data.num_drones >= expected_nodes)
++        {
++            start = true;
++        }
++
++        if (start && !launched
++         && net_client_received_wait_data
++         && net_client_wait_data.is_controller)
++        {
++            NET_CL_LaunchGame();
++            launched = true;
++        }
++
++        DrawLobby(screen, sizeof(screen));
++
++        if (strcmp(screen, drawn))
++        {
++            NET_LobbyPrint("%s", screen);
++            M_StringCopy(drawn, screen, sizeof(drawn));
++        }
++
++        NET_CL_Run();
++        NET_SV_Run();
++
++        if (!net_client_connected)
++        {
++            I_Error("Lost connection to the deathmatch host.");
++        }
++
++        I_Sleep(50);
++    }
++
++    if (have_term)
++    {
++        tcsetattr(console_fd, TCSANOW, &old_term);
++    }
++
++    NET_LobbyPrint("\033[H\033[2JStarting the deathmatch...\n");
++    NET_Serial_Launched();
++}
+--- a/fbdoom/net_lobby.h
++++ b/fbdoom/net_lobby.h
+@@ -0,0 +1,27 @@
++//
++// Copyright(C) 2026 PostHog
++//
++// This program is free software; you can redistribute it and/or
++// modify it under the terms of the GNU General Public License
++// as published by the Free Software Foundation; either version 2
++// of the License, or (at your option) any later version.
++//
++// This program is distributed in the hope that it will be useful,
++// but WITHOUT ANY WARRANTY; without even the implied warranty of
++// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++// GNU General Public License for more details.
++//
++// DESCRIPTION:
++//     Text lobby for network games in the PostHog browser terminal.
++//
++
++#ifndef NET_LOBBY_H
++#define NET_LOBBY_H
++
++// Room code of the hosted game, set by the serial network module.
++extern char net_serial_room[16];
++
++void NET_LobbyPrint(const char *format, ...);
++void NET_Serial_Launched(void);
++
++#endif /* #ifndef NET_LOBBY_H */
+--- a/fbdoom/net_serial.c
++++ b/fbdoom/net_serial.c
+@@ -0,0 +1,412 @@
++//
++// Copyright(C) 2026 PostHog
++//
++// This program is free software; you can redistribute it and/or
++// modify it under the terms of the GNU General Public License
++// as published by the Free Software Foundation; either version 2
++// of the License, or (at your option) any later version.
++//
++// This program is distributed in the hope that it will be useful,
++// but WITHOUT ANY WARRANTY; without even the implied warranty of
++// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++// GNU General Public License for more details.
++//
++// DESCRIPTION:
++//     Network module for the PostHog browser terminal. The guest has no
++//     network card, so packets travel over a serial port to the browser,
++//     which relays them to the other players.
++//
++//     Each SLIP frame starts with a peer byte. Guest frames name the
++//     destination and host frames name the source. Peer 0 is the game
++//     host and peer 255 carries text control messages.
++//
++//     This replaces net_sdl.c and keeps its module name so that the
++//     Chocolate Doom call sites stay unchanged.
++//
++
++#include <ctype.h>
++#include <errno.h>
++#include <fcntl.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <termios.h>
++#include <unistd.h>
++
++#include "doomtype.h"
++#include "i_system.h"
++#include "i_timer.h"
++#include "m_misc.h"
++#include "net_defs.h"
++#include "net_io.h"
++#include "net_lobby.h"
++#include "net_packet.h"
++#include "net_sdl.h"
++
++#define SERIAL_DEVICE "/dev/ttyS2"
++#define CONTROL_PEER 255
++#define HOST_PEER 0
++#define MAX_FRAME 1500
++#define REPLY_TIMEOUT_MS 30000
++
++#define SLIP_END 0xc0
++#define SLIP_ESC 0xdb
++#define SLIP_ESC_END 0xdc
++#define SLIP_ESC_ESC 0xdd
++
++static int serial_fd = -1;
++static net_addr_t peers[CONTROL_PEER];
++
++static byte frame[MAX_FRAME];
++static size_t frame_len;
++static boolean frame_escaped;
++static boolean frame_overflow;
++
++static byte input[512];
++static size_t input_len;
++static size_t input_pos;
++
++static char control_reply[128];
++
++char net_serial_room[16];
++
++static boolean OpenSerial(void)
++{
++    struct termios term;
++
++    if (serial_fd >= 0)
++    {
++        return true;
++    }
++
++    serial_fd = open(SERIAL_DEVICE, O_RDWR | O_NOCTTY | O_NONBLOCK);
++
++    if (serial_fd < 0)
++    {
++        return false;
++    }
++
++    if (tcgetattr(serial_fd, &term) == 0)
++    {
++        cfmakeraw(&term);
++        tcsetattr(serial_fd, TCSANOW, &term);
++    }
++
++    // Discard frames left over from an earlier game.
++    tcflush(serial_fd, TCIOFLUSH);
++
++    return true;
++}
++
++static void WriteAll(const byte *data, size_t len)
++{
++    while (len > 0)
++    {
++        ssize_t written = write(serial_fd, data, len);
++
++        if (written < 0)
++        {
++            if (errno == EAGAIN || errno == EINTR)
++            {
++                I_Sleep(1);
++                continue;
++            }
++
++            I_Error("Lost the connection to the PostHog terminal.");
++        }
++
++        data += written;
++        len -= written;
++    }
++}
++
++static void SendFrame(byte peer, const byte *data, size_t len)
++{
++    byte encoded[MAX_FRAME * 2 + 4];
++    size_t out = 0;
++    size_t i;
++
++    encoded[out++] = SLIP_END;
++
++    for (i = 0; i <= len && out < sizeof(encoded) - 3; ++i)
++    {
++        byte value = i == 0 ? peer : data[i - 1];
++
++        if (value == SLIP_END)
++        {
++            encoded[out++] = SLIP_ESC;
++            encoded[out++] = SLIP_ESC_END;
++        }
++        else if (value == SLIP_ESC)
++        {
++            encoded[out++] = SLIP_ESC;
++            encoded[out++] = SLIP_ESC_ESC;
++        }
++        else
++        {
++            encoded[out++] = value;
++        }
++    }
++
++    encoded[out++] = SLIP_END;
++
++    WriteAll(encoded, out);
++}
++
++static void SendControl(const char *message)
++{
++    SendFrame(CONTROL_PEER, (const byte *) message, strlen(message));
++}
++
++static net_addr_t *PeerAddress(int peer)
++{
++    peers[peer].module = &net_sdl_module;
++    peers[peer].handle = &peers[peer];
++
++    return &peers[peer];
++}
++
++static int AddressPeer(net_addr_t *addr)
++{
++    return addr - peers;
++}
++
++// Reads the next complete frame into frame[] and returns its length,
++// or zero when no complete frame is waiting.
++
++static size_t ReadFrame(void)
++{
++    for (;;)
++    {
++        byte value;
++
++        if (input_pos == input_len)
++        {
++            ssize_t result = read(serial_fd, input, sizeof(input));
++
++            if (result <= 0)
++            {
++                return 0;
++            }
++
++            input_len = result;
++            input_pos = 0;
++        }
++
++        value = input[input_pos++];
++
++        if (value == SLIP_END)
++        {
++            size_t len = frame_overflow ? 0 : frame_len;
++
++            frame_len = 0;
++            frame_escaped = false;
++            frame_overflow = false;
++
++            if (len > 0)
++            {
++                return len;
++            }
++
++            continue;
++        }
++
++        if (frame_escaped)
++        {
++            value = value == SLIP_ESC_END ? SLIP_END
++                  : value == SLIP_ESC_ESC ? SLIP_ESC
++                  : value;
++            frame_escaped = false;
++        }
++        else if (value == SLIP_ESC)
++        {
++            frame_escaped = true;
++            continue;
++        }
++
++        if (frame_len < sizeof(frame))
++        {
++            frame[frame_len++] = value;
++        }
++        else
++        {
++            frame_overflow = true;
++        }
++    }
++}
++
++// Handles a control frame from the browser. Replies to the current
++// request are stored in control_reply.
++
++static void HandleControl(size_t len)
++{
++    char message[sizeof(control_reply)];
++
++    len = len - 1 < sizeof(message) - 1 ? len - 1 : sizeof(message) - 1;
++    memcpy(message, frame + 1, len);
++    message[len] = '\0';
++
++    if (!strncmp(message, "error ", 6))
++    {
++        I_Error("%s", message + 6);
++    }
++
++    M_StringCopy(control_reply, message, sizeof(control_reply));
++}
++
++// Waits for a control reply that starts with the given prefix.
++
++static void WaitForControl(const char *prefix, const char *status)
++{
++    int start = I_GetTimeMS();
++    size_t len;
++
++    control_reply[0] = '\0';
++    NET_LobbyPrint("%s\n", status);
++
++    while (strncmp(control_reply, prefix, strlen(prefix)))
++    {
++        if (I_GetTimeMS() - start > REPLY_TIMEOUT_MS)
++        {
++            I_Error("The PostHog terminal did not respond. Close Doom and try again.");
++        }
++
++        len = ReadFrame();
++
++        if (len == 0)
++        {
++            I_Sleep(10);
++        }
++        else if (frame[0] == CONTROL_PEER)
++        {
++            HandleControl(len);
++        }
++    }
++}
++
++static boolean NET_Serial_InitClient(void)
++{
++    return OpenSerial();
++}
++
++static boolean NET_Serial_InitServer(void)
++{
++    if (!OpenSerial())
++    {
++        I_Error("Multiplayer needs a newer PostHog terminal. Reload PostHog and try again.");
++    }
++
++    SendControl("host");
++    WaitForControl("room ", "Opening a deathmatch room...");
++    M_StringCopy(net_serial_room, control_reply + 5, sizeof(net_serial_room));
++
++    return true;
++}
++
++static void NET_Serial_SendPacket(net_addr_t *addr, net_packet_t *packet)
++{
++    // LAN discovery broadcasts have no meaning without a network.
++    if (addr == &net_broadcast_addr || addr->module != &net_sdl_module)
++    {
++        return;
++    }
++
++    SendFrame(AddressPeer(addr), packet->data, packet->len);
++}
++
++static boolean NET_Serial_RecvPacket(net_addr_t **addr, net_packet_t **packet)
++{
++    size_t len;
++
++    while ((len = ReadFrame()) > 0)
++    {
++        if (frame[0] == CONTROL_PEER)
++        {
++            HandleControl(len);
++            continue;
++        }
++
++        *packet = NET_NewPacket(len - 1);
++        memcpy((*packet)->data, frame + 1, len - 1);
++        (*packet)->len = len - 1;
++        *addr = PeerAddress(frame[0]);
++
++        return true;
++    }
++
++    return false;
++}
++
++static void NET_Serial_AddrToString(net_addr_t *addr, char *buffer, int buffer_len)
++{
++    int peer = AddressPeer(addr);
++
++    if (peer == HOST_PEER)
++    {
++        M_StringCopy(buffer, "host", buffer_len);
++    }
++    else
++    {
++        M_snprintf(buffer, buffer_len, "player %i", peer);
++    }
++}
++
++static void NET_Serial_FreeAddress(net_addr_t *addr)
++{
++    // Peer addresses are static.
++}
++
++// Accepts a room code from -connect. Anything else, such as the master
++// server's hostname, cannot be reached from the terminal.
++
++static net_addr_t *NET_Serial_ResolveAddress(char *address)
++{
++    char message[32];
++    size_t i;
++    size_t len = strlen(address);
++
++    if (len < 4 || len > 12)
++    {
++        return NULL;
++    }
++
++    for (i = 0; i < len; ++i)
++    {
++        if (!isalnum((unsigned char) address[i]))
++        {
++            return NULL;
++        }
++    }
++
++    if (!OpenSerial())
++    {
++        I_Error("Multiplayer needs a newer PostHog terminal. Reload PostHog and try again.");
++    }
++
++    M_snprintf(message, sizeof(message), "join %s", address);
++    SendControl(message);
++    WaitForControl("joined", "Joining the deathmatch room...");
++
++    return PeerAddress(HOST_PEER);
++}
++
++// Tells the browser that the game started, so it stops accepting players.
++
++void NET_Serial_Launched(void)
++{
++    if (serial_fd >= 0)
++    {
++        SendControl("launched");
++    }
++}
++
++net_module_t net_sdl_module =
++{
++    NET_Serial_InitClient,
++    NET_Serial_InitServer,
++    NET_Serial_SendPacket,
++    NET_Serial_RecvPacket,
++    NET_Serial_AddrToString,
++    NET_Serial_FreeAddress,
++    NET_Serial_ResolveAddress,
++};
